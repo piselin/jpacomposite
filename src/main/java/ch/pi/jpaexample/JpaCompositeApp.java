@@ -1,4 +1,4 @@
-package ch.pi.accessingdatamysql;
+package ch.pi.jpaexample;
 
 
 import org.springframework.boot.SpringApplication;

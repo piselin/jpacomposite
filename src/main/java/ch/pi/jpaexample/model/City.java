@@ -1,4 +1,4 @@
-package ch.pi.accessingdatamysql.model;
+package ch.pi.jpaexample.model;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
