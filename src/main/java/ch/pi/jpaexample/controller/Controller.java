@@ -1,62 +1,63 @@
 package ch.pi.jpaexample.controller;
 
-import ch.pi.jpaexample.model.City;
 import ch.pi.jpaexample.model.Region;
-import ch.pi.jpaexample.repositories.RegionRepository;
-import ch.pi.jpaexample.model.Area;
+import ch.pi.jpaexample.service.CsvHelper;
+import ch.pi.jpaexample.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @org.springframework.stereotype.Controller
 @RequestMapping(path = "/demo")
 public class Controller {
-  @Autowired
-  private RegionRepository regionRepository;
 
-  @GetMapping(path = "/all")
+  @Autowired
+  private FileService fileService;
+
+  @GetMapping(path = "/regions")
   public @ResponseBody
   Iterable<Region> getAllRegions() {
-    return regionRepository.findAll();
+    return fileService.getAllRegions();
   }
 
-  @PostMapping(path = "/area")
-  public @ResponseBody
-  String addAreas(@RequestParam String name) {
-    Area a = new Area();
-    a.setName(name);
+  @PostMapping("/upload_counties")
+  public ResponseEntity<String> uploadCounties(@RequestParam("file") MultipartFile file) {
+    String message;
+    if (CsvHelper.hasCSVFormat(file)) {
+      try {
+        fileService.saveCounties(file);
 
-    Area a2 = new Area();
-    a2.setName("another a of r1");
+        message = "Uploaded the file successfully: " + file.getOriginalFilename();
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+      } catch (Exception e) {
+        message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+      }
+    }
 
-    City nyc = new City();
-    nyc.setZipCode("ZH-8712");
-
-    Region r = new Region();
-    r.setName("Region 1");
-    r.setAreas(List.of(a, nyc, a2));
-
-    Region r2 = new Region();
-    r2.setName("R2");
-
-    Area a3 = new Area();
-    a3.setName("a3");
-    r2.setAreas(List.of(a3));
-
-    Region r3 = new Region();
-    r3.setName("r3");
-
-    Area a4 = new Area();
-    a4.setName("A4");
-
-    r3.setAreas(List.of(a4, new City()));
-
-    regionRepository.save(r);
-    regionRepository.save(r2);
-    regionRepository.save(r3);
-
-    return "Done";
+    message = "Please upload a csv file!";
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
   }
 
+  @PostMapping("/upload_states")
+  public ResponseEntity<String> uploadStates(@RequestParam("file") MultipartFile file) {
+    String message;
+
+    if (CsvHelper.hasCSVFormat(file)) {
+      try {
+        fileService.saveStates(file);
+
+        message = "Uploaded the file successfully: " + file.getOriginalFilename();
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+      } catch (Exception e) {
+        message = "Could not upload the file: " + file.getOriginalFilename() + "!";
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+      }
+    }
+
+    message = "Please upload a csv file!";
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+  }
 }

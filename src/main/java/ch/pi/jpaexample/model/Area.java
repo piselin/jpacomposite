@@ -6,14 +6,15 @@ import javax.persistence.*;
 @Table(name = "area")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue("area")
+@DiscriminatorValue("county")
 public class Area {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "area_id", nullable = false)
-  private Integer areaId;
-  private String name;
+  protected Integer areaId;
+  protected String name;
+  protected String stateId;
 
   public Integer getAreaId() {
     return areaId;
@@ -29,6 +30,14 @@ public class Area {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getStateId() {
+    return stateId;
+  }
+
+  public void setStateId(String stateId) {
+    this.stateId = stateId;
   }
 }
 
